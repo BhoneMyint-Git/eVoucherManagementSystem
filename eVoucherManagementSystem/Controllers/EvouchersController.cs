@@ -120,7 +120,7 @@ namespace eVoucherManagementSystem.Controllers
         {
             try
             {
-                
+
                 var voucher = await _context.TblEvouchers.FindAsync(eVoucher.Id);
                 if (voucher == null)
                 {
@@ -185,20 +185,20 @@ namespace eVoucherManagementSystem.Controllers
             }
             //prepare api to get promocode related to phone number
             PromoCodeGetModel getPromo = new PromoCodeGetModel();
-            var client = new RestClient($"https://localhost:7207/api/Promocodes/GetPromoCode");
-            var request = new RestRequest("https://localhost:7207/api/Promocodes/GetPromoCode", Method.Get);
-            request.AddHeader("Content-Type", "application/json");
-            string token = GetJwTTokenFromPromoManagementSystem();
-            client.Authenticator = new JwtAuthenticator(token.Replace("\"", ""));
+
             foreach (var purchase in purchaseList)
             {
-
+                var client = new RestClient($"https://localhost:7207/api/Promocodes/GetPromoCode");
+                var request = new RestRequest("https://localhost:7207/api/Promocodes/GetPromoCode", Method.Get);
+                request.AddHeader("Content-Type", "application/json");
+                string token = GetJwTTokenFromPromoManagementSystem();
+                client.Authenticator = new JwtAuthenticator(token.Replace("\"", ""));
                 getPromo.Phone = purchase.Phone;
                 request.AddBody(JsonConvert.SerializeObject(getPromo));
                 RestResponse response = await client.ExecuteAsync(request);
                 var output = response.Content;
                 //add promo code to purchase history
-                if (output != null && output!="[]")
+                if (output != null && output != "[]")
                 {
                     var data = JsonConvert.DeserializeObject<List<AvaliablePromo>>(output);
                     var purchasedHistroy = (from o in _context.TblPurchasehistories
